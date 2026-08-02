@@ -1,0 +1,58 @@
+---
+/**
+ * Kotova navbar, replacing Starlight's default header.
+ *
+ * Mirrors the navbar on kotova.io/services with the differences from the brief:
+ *   - brand suffix "IT" → "DOCS"
+ *   - the "Services" link is dropped
+ *   - the currency switcher is dropped (it calls the landing site's Netlify
+ *     function, which would be cross-origin here, and no page shows a price)
+ *   - a search control is added at the left of the right-aligned group
+ *
+ * The hamburger is NOT rendered here — Starlight's PageFrame renders
+ * <MobileMenuToggle /> inside the sidebar <nav>. It is restyled in kotova.css to
+ * sit inside this bar rather than float over it.
+ */
+import config from 'virtual:starlight/user-config';
+import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
+import Search from 'virtual:starlight/components/Search';
+
+const shouldRenderSearch =
+  config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+
+// Locale-aware home link: /de/… keeps the reader in their locale.
+const locale = Astro.currentLocale;
+const homeHref = locale && locale !== 'en' ? `/${locale}/` : '/';
+---
+
+<div class="kt-nav">
+  <a href={homeHref} class="kt-brand">
+    <img src="/images/panther.svg" alt="" aria-hidden="true" class="kt-brand-logo" width="44" height="44" />
+    <span class="kt-brand-accent">KOTOVA</span>
+    <span class="kt-brand-suffix">DOCS</span>
+  </a>
+
+  <div class="kt-nav-right">
+    {shouldRenderSearch && <Search />}
+
+    <div class="kt-nav-links">
+      <a href="https://kotova.io/#contact" class="kt-nav-link">Contact</a>
+      <span class="kt-nav-separator" aria-hidden="true"></span>
+      <a
+        href="https://kotova.io"
+        class="kt-nav-link kt-nav-globe"
+        title="kotova.io"
+        aria-label="kotova.io homepage"
+      >
+        <svg class="kt-globe-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"></path>
+        </svg>
+      </a>
+    </div>
+
+    <a href="https://app.kotova.io/" class="kt-app-btn">Launch App</a>
+
+    <div class="kt-lang"><LanguageSelect /></div>
+  </div>
+</div>

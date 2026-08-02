@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="kotovaGold" x1="0%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#F5E6B8"/>
+      <stop offset="35%" stop-color="#E5CB90"/>
+      <stop offset="65%" stop-color="#D8BD86"/>
+      <stop offset="100%" stop-color="#A4853F"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(76.8,76.8) scale(0.85)">
+    <path d="M648.2,632.8 L639.0,672.4 L730.5,736.9 L777.2,731.5 L802.5,666.6 L730.8,687.1 L657.4,631.8 Z M333.5,375.8 L150.5,746.2 L453.6,498.7 L394.6,459.4 Z M457.4,292.2 L512.3,337.6 L426.7,457.7 L730.1,670.4 L815.1,641.7 L838.0,604.5 L806.9,556.7 L710.0,483.0 L604.2,435.2 L699.4,433.5 L718.2,468.3 L812.4,540.7 L869.7,543.1 L769.0,448.2 L731.5,375.1 L571.1,308.6 Z M309.2,223.2 L308.2,316.1 L407.6,439.6 L489.1,337.2 Z" fill="url(#kotovaGold)" fill-rule="evenodd"/>
+  </g>
+</svg>

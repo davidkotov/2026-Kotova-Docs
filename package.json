@@ -1,0 +1,20 @@
+{
+  "name": "kotova-docs",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Product documentation for Kotova X — docs.kotova.io",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.41.6",
+    "astro": "^7.1.6",
+    "sharp": "^0.35.3"
+  }
+}

@@ -1,0 +1,70 @@
+---
+title: Welcome
+description: Documentation for Kotova X — the non-custodial swap aggregator. What it is, how it works, and where to go when something goes wrong.
+---
+
+Kotova X compares live quotes from several independent swap providers and routes
+your order to whichever one offers the most for your trade. Your funds go directly
+from your wallet to the provider that executes the swap. They never pass through
+Kotova.
+
+These pages explain what that means in practice, what happens at each step of a
+swap, and what to do when something does not go to plan.
+
+## What Kotova is
+
+Kotova is a comparison and routing layer, not an exchange. It does not hold your
+funds, it does not trade against your order, and it does not require an account.
+
+That distinction shapes almost everything else in this documentation, so it is worth
+being precise about it up front:
+
+- **Kotova compares** — for every swap it asks several liquidity providers what they
+  would give you, in parallel.
+- **Kotova routes** — it sends your order to the one offering the best result, unless
+  you have chosen otherwise.
+- **The provider executes** — you send your funds to a deposit address belonging to
+  that provider, and they send the swapped asset to your wallet.
+
+Kotova is not a party to the transfer at any point. There is no stage at which your
+assets sit in a Kotova wallet, not even briefly.
+
+## The three products
+
+Only one of the three is available today. The other two are on the roadmap and
+cannot currently be used.
+
+| Product | What it does | Status |
+| --- | --- | --- |
+| **Kotova X** | Non-custodial instant swaps between crypto assets | **Live** |
+| **Kotova Pay** | Crypto to SEPA payments and invoice handling | Planned for 2027 |
+| **Kotova Deal** | Non-custodial escrow using multi-signature release | Planned for 2027 |
+
+Everything in this documentation refers to Kotova X unless a page says otherwise.
+
+## Where to start
+
+<div class="not-content">
+
+- **New to Kotova X?** Read [What is Kotova X](/introduction/what-is-kotova-x) first —
+  it covers the aggregator model and what Kotova deliberately does not do.
+- **Want to understand the mechanics?** [Quoting and routing](/how-it-works/quoting-and-routing)
+  explains how a provider is chosen for your order, and
+  [The order lifecycle](/how-it-works/order-lifecycle) covers what happens after you
+  press confirm.
+- **Concerned about custody or counterparty risk?**
+  [Non-custodial architecture](/introduction/non-custodial) and
+  [Security overview](/security/overview) are the two pages to read.
+- **Security researcher?** See [Bug bounty](/security/bug-bounty).
+
+</div>
+
+## Something went wrong with a swap
+
+Go straight to [Troubleshooting](/help/troubleshooting). It covers the common cases —
+a swap taking longer than expected, a lost order link, a missing memo, the wrong
+network, an amount that differs from the estimate.
+
+If your order needs a decision from you, your order page will say so. Swaps are
+irreversible once broadcast to a blockchain, so it is worth reading
+[Refunds and emergencies](/how-it-works/refunds) before you send anything.
