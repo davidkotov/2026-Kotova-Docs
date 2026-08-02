@@ -7,12 +7,10 @@ Ranked by how much each blocks the build. Update this file as answers land.
 ## Blocking — nothing can be built until answered
 
 ### Q1 — Tech stack
-**Recommendation: Astro + Starlight + Pagefind.** Reasoning in `PLAN.md` §5.
-Runner-up: hand-rolled static HTML matching the landing site exactly (maximum brand
-fidelity, but sidebar + scroll-spy + search + ~30 pages of navigation all
-hand-maintained).
-**Blocks:** everything.
-**Status:** _open_
+**DECIDED 2026-08-02: Astro + Starlight + Pagefind.** Reasoning in `PLAN.md` §5.
+Static output, dark-only, own Netlify site. Navbar and footer land as `.astro`
+component overrides so the existing Kotova markup is reused verbatim.
+**Status:** ✅ **decided**
 
 ### Q2 — DNS and deployment target
 `docs.kotova.io` does not resolve today (`ENOTFOUND`). Needs a DNS record and a new
@@ -22,12 +20,11 @@ a forced catch-all 404, so it cannot host this.
 **Status:** _open_
 
 ### Q3 — Language scope at launch
-**Recommendation: English-only, with the locale structure wired from day one.**
-Six locales × ~30 pages is a different project. Starlight falls back to English with
-a notice for missing pages, so the language switcher stays honest and translations
-land incrementally.
-**Blocks:** content model, URL model, sidebar component, translation budget.
-**Status:** _open_
+**DECIDED 2026-08-02: English only, locale structure wired from day one.**
+`defaultLocale: 'root'` with all six locale entries configured and no content in
+them. Starlight falls back to English with a notice for missing pages, so the
+language switcher stays honest and translations land incrementally.
+**Status:** ✅ **decided**
 
 ### Q4 — Legal sign-off on unbacked claims
 The six items in `PLAN.md` §8 (A1, A2, A3/A4, A5, A6, A7). These are "fix the source
@@ -52,12 +49,10 @@ removed. Current reading, to confirm or correct:
 **Status:** _open_
 
 ### Q6 — Bug bounty: four sub-decisions, all needed together
-1. **Reward budget.** Published table or recognition-only. Suggested table:
+1. **Reward budget — DECIDED 2026-08-02: published table.**
    Critical €1,000–2,500 / High €300–750 / Medium €100–250 / Low recognition.
-   A published table is materially more credible than "at our discretion" (which is
-   what Chainflip and SideShift both use). If the budget is genuinely zero, publish a
-   recognition-only VDP with an explicit intent line — **do not publish a table you
-   cannot honour**, because it cannot be walked back.
+   ⚠️ This is a public commitment that cannot be walked back. Confirm the budget is
+   actually available before the page ships.
 2. **Which legal entity makes the no-legal-action promise.** Public copy names no
    legal form. A safe-harbour undertaking from an unnamed party is weak.
 3. **Who owns `security@kotova.io`, holds the PGP key, and is rostered against the
@@ -71,15 +66,19 @@ removed. Current reading, to confirm or correct:
 
 Also: self-host (recommended for v1) versus a platform — HackerOne VDPs start around
 $8–12k/yr.
-**Blocks:** the entire Bug Bounty page.
-**Status:** _open_
+**Blocks:** the entire Bug Bounty page. Sub-decision 1 is settled; 2, 3 and 4 remain.
+**Status:** 🟡 **partly decided** — reward model set, entity / mailbox / broker scope open
 
 ### Q7 — Does "Kotova vs Competitors" ship, and in what form?
-**Recommendation: yes, but not in v1.** Full reasoning in `PLAN.md` §7 — UWG §6,
-the internal no-disparagement rule, and the fact that most obvious "competitors" are
-Kotova's own contracted suppliers.
-**Blocks:** that page only, but it is the highest-risk page on the site.
-**Status:** _open_
+**DECIDED 2026-08-02: ships in v1.2, named and counsel-reviewed.** Two tiers —
+genuine peers (Swapzone, SwapSpace, Trocador) and adjacent categories for orientation
+(Rango, LI.FI/Jumper, BestChange). Kotova's own liquidity partners never appear as
+competitors. Requires archived source citations, a visible snapshot date, a stated
+methodology, a corrections address, a committed quarterly re-verification, and German
+Wettbewerbsrecht sign-off **before** publication.
+**Still needed:** counsel engaged; a calendar entry for the re-verification cadence
+created at the same time the page ships.
+**Status:** ✅ **decided** (execution gated on counsel)
 
 ### Q8 — Canonical numbers
 Source count, asset/network count *with a documented counting rule*, launch metrics,
