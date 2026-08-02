@@ -1,0 +1,113 @@
+/* ===================================================================
+   KOTOVA — design tokens for docs.kotova.io
+   Stack-agnostic. Lifted verbatim from
+   2026-Kotova-LandingPage/styles.css :root, plus four values the brand
+   page (kotova.io/press/brand-assets) uses but never tokenised.
+   Keep in sync with the landing site; it is the source of truth.
+   =================================================================== */
+
+:root {
+    /* --- Corporate colours ------------------------------------------ */
+    --color-primary: #1B2B4B;          /* Deep Navy   */
+    --color-secondary: #C5A572;        /* Gold accent */
+    --color-background: #0A0F1C;       /* Dark Navy   */
+    --color-background-light: #111827;
+    --color-background-card: #151C2C;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #8B95A5;   /* Slate       */
+    --color-text-muted: #5A6478;       /* see note below */
+    --color-success: #00D4AA;          /* Signal Green */
+    --color-error: #FF4757;
+    --color-border: rgba(197, 165, 114, 0.2);
+    --color-border-light: rgba(255, 255, 255, 0.1);
+
+    /* --- Additions not present on the landing site ------------------- */
+    /* Foreground for text sitting ON gold (buttons, search highlight
+       chips). The landing site hardcodes this hex in several places. */
+    --color-on-gold: #1a1205;
+    /* The logo presentation backdrop from the brand-assets page. */
+    --color-logo-backdrop-start: #0D1424;
+    --color-logo-backdrop-end: #101A30;
+
+    /* --- Gradients --------------------------------------------------- */
+    --gradient-primary: linear-gradient(135deg, #C5A572 0%, #E8D5B5 50%, #C5A572 100%);
+    --gradient-hero: linear-gradient(180deg, rgba(10, 15, 28, 0) 0%, rgba(10, 15, 28, 0.8) 50%, rgba(10, 15, 28, 1) 100%);
+    --gradient-card: linear-gradient(145deg, rgba(27, 43, 75, 0.5) 0%, rgba(21, 28, 44, 0.8) 100%);
+    /* NOT the same gold as --gradient-primary. Do not conflate them. */
+    --gradient-logo: linear-gradient(135deg, #F5E6B8 0%, #E5CB90 35%, #D8BD86 65%, #A4853F 100%);
+
+    /* --- Typography -------------------------------------------------- */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+    /* --- Spacing ----------------------------------------------------- */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-m2: 22px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    --spacing-3xl: 64px;
+    --spacing-4xl: 96px;
+
+    /* --- Radii ------------------------------------------------------- */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* --- Shadows ----------------------------------------------------- */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.6);
+    --shadow-gold: 0 4px 20px rgba(197, 165, 114, 0.3);
+
+    /* --- Transitions ------------------------------------------------- */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+
+    /* --- Docs layout geometry (see PLAN.md §4) ----------------------- */
+    --docs-shell-max: 1440px;
+    --docs-sidebar-w: 288px;
+    --docs-sidebar-gutter: 48px;
+    --docs-content-max: 768px;
+    --docs-content-max-wide: 1152px;
+    --docs-toc-w: 256px;
+    --docs-header-h: 64px;
+}
+
+/* ===================================================================
+   Accessibility corrections.
+   These are absent from the landing site's 4,126-line stylesheet.
+   Fix them here; consider backporting.
+   =================================================================== */
+
+:focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+}
+
+::selection {
+    background: rgba(197, 165, 114, 0.3);
+    color: var(--color-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* NOTE on --color-text-muted (#5A6478):
+   contrast against --color-background is ~3.2:1, below the WCAG AA 4.5:1
+   threshold for body text, and the landing site currently uses it on its
+   smallest type. Do not use it for readable copy on this site — reserve it
+   for decorative or non-essential text only. Prefer --color-text-secondary. */
