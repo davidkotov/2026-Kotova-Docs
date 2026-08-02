@@ -85,7 +85,7 @@ export default defineConfig({
             { label: 'Quoting and routing', link: '/how-it-works/quoting-and-routing' },
             { label: 'The order lifecycle', link: '/how-it-works/order-lifecycle' },
             { label: 'Fees', link: '/how-it-works/fees' },
-            { label: 'Refunds and emergencies', link: '/how-it-works/refunds' },
+            { label: 'Refunds, cancellations and emergencies', link: '/how-it-works/refunds' },
             { label: 'Liquidity sources', link: '/how-it-works/liquidity-sources' },
           ],
         },

@@ -36,6 +36,52 @@ architecture. Arguably the whole launch.
 
 ---
 
+## Pre-launch gates found by the content audit (2026-08-02)
+
+The 17 pages are written. These must be closed **before the site is made public**;
+none of them blocks further building.
+
+### G1 — Verify Godex is live, against production Postgres
+`catalog-snapshot.json` (exported 2026-07-09) lists ten sources with no `is_active`
+column, so the repo cannot answer this. Godex appears in the source table on
+`/how-it-works/liquidity-sources` and in the nine-source count used across five pages.
+If it is inactive, the count and every list is wrong at once. See Q8 / PLAN §9 B7.
+
+### G2 — Bug bounty cannot go public until its contact route exists
+`/security/bug-bounty` is written and carries a `:::caution` saying the programme is not
+open. It must not lose that banner until **all** of: `security@kotova.io` exists and is
+rostered; a PGP key is published; `/.well-known/security.txt` is live on every in-scope
+host; and the safe-harbour undertaking names an entity (Q6.2). The page deliberately does
+not name `broker.kotova.io` — Q6.4 is still open and naming a fund-holding host on a page
+inviting attack traffic would be the wrong way to resolve it.
+
+### G3 — Asset and network counts are still unstated
+Three pages say "hundreds of assets across dozens of networks" because Q8/B2 is open.
+The snapshot says 1,451 assets / 77 blockchains / 1,827 asset-chain pairs, so the current
+wording is materially *understated*. Decide the counting rule, then state one number with
+the rule and a date beside it.
+
+### G4 — Two claims the docs deliberately route around
+`/security/privacy` points at the Privacy Policy for retention periods rather than
+restating the 12-month deletion or the 48-hour erasure window, because neither is
+implemented (PLAN §8 A2). `/security/overview` says nothing about CSP or passcode
+rate-limiting, because neither exists. If Q4 closes by *fixing the code*, both pages can
+be strengthened. If it closes by amending the policy, both stay as they are.
+
+### G5 — Counsel review of the per-provider material
+The freeze-capability tables were collapsed from per-provider rows to an architectural
+split (centralised vs Chainflip), which removes the comparative-table exposure at no
+information cost. What remains — naming all nine suppliers, and describing what
+centralised custody means — should still go past the same counsel review as the
+competitors page (PLAN §7).
+
+### G6 — Keep the source roster in sync
+The nine-source list is now hardcoded prose in the app FAQ (six locales), on
+`/how-it-works/liquidity-sources` and on `/security/counterparty-risk`. Add all three to
+the source-onboarding checklist.
+
+---
+
 ## High — blocks a named section
 
 ### Q5 — Navbar search placement

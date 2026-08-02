@@ -1,6 +1,6 @@
 ---
-title: What is Kotova X
-description: Kotova X is a non-custodial aggregator that compares quotes from independent swap providers and routes your order to the best one. It is not an exchange.
+title: "What is Kotova X"
+description: "Kotova X is a non-custodial aggregator that compares quotes from independent swap providers and routes your order to the best one. It is not an exchange."
 ---
 
 Kotova X is a non-custodial aggregator for instant crypto swaps. For every trade it
@@ -68,7 +68,7 @@ you would rather not use, or restrict routing to non-custodial venues entirely. 
 
 To be explicit, because these are common misreadings:
 
-- Kotova is **not a regulated exchange**, a bank, a broker, or a custodian.
+- Kotova is **not an exchange**, a bank, a broker, or a custodian.
 - Kotova does **not provide investment advice** and takes no view on any asset.
 - Kotova does **not guarantee** the performance or solvency of any connected provider.
 - Kotova cannot **reverse** a swap once it has been broadcast to a blockchain.

@@ -1,6 +1,6 @@
 ---
-title: Non-custodial architecture
-description: Where your funds actually go during a Kotova X swap, and what non-custodial does and does not protect you from.
+title: "Non-custodial architecture"
+description: "Where your funds actually go during a Kotova X swap, and what non-custodial does and does not protect you from."
 ---
 
 "Non-custodial" is used loosely across the industry, often to mean "we give the funds
