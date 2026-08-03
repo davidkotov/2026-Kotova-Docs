@@ -1,0 +1,255 @@
+---
+/**
+ * Search, as an inline combobox rather than Starlight's full-screen modal.
+ *
+ * Starlight's default opens a <dialog> centred over a dimmed page. This renders
+ * a real <input> in the navbar with the result panel dropping down directly
+ * beneath it, anchored to the input — the docs.rango.exchange behaviour.
+ *
+ * Talks to the Pagefind JS API directly (`/pagefind/pagefind.js`), which
+ * Starlight's integration still generates at build time. Pagefind builds one
+ * index per language and picks the right one from <html lang>, so results stay
+ * inside the reader's locale.
+ *
+ * Note: the index only exists in a real build. Under `astro dev` there is no
+ * /pagefind/ directory, so the panel says so instead of failing silently.
+ */
+const isDev = import.meta.env.DEV;
+---
+
+<kotova-search class="kt-search" data-dev={isDev ? '' : undefined}>
+  <div class="kt-search-field">
+    <svg class="kt-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+
+    <input
+      type="text"
+      class="kt-search-input"
+      placeholder={Astro.locals.t('search.label')}
+      autocomplete="off"
+      spellcheck="false"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-expanded="false"
+      aria-controls="kt-search-results"
+      aria-label={Astro.locals.t('search.label')}
+    />
+
+    <kbd class="kt-search-kbd" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></kbd>
+
+    <button class="kt-search-clear" type="button" aria-label="Clear search" hidden>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="kt-search-panel" hidden>
+    <ul id="kt-search-results" class="kt-search-results" role="listbox" aria-live="polite"></ul>
+    <div class="kt-search-status" role="status"></div>
+    <div class="kt-search-hint" aria-hidden="true">
+      <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+      <span><kbd>↵</kbd> Open</span>
+      <span><kbd>esc</kbd> Close</span>
+    </div>
+  </div>
+</kotova-search>
+
+<script>
+  const MAX_RESULTS = 8;
+  const DEBOUNCE_MS = 180;
+
+  class KotovaSearch extends HTMLElement {
+    private input!: HTMLInputElement;
+    private panel!: HTMLElement;
+    private list!: HTMLUListElement;
+    private status!: HTMLElement;
+    private clearBtn!: HTMLButtonElement;
+    private pagefind: any = null;
+    private timer: number | undefined;
+    private active = -1;
+    private seq = 0;
+
+    connectedCallback() {
+      this.input = this.querySelector('.kt-search-input') as HTMLInputElement;
+      this.panel = this.querySelector('.kt-search-panel') as HTMLElement;
+      this.list = this.querySelector('.kt-search-results') as HTMLUListElement;
+      this.status = this.querySelector('.kt-search-status') as HTMLElement;
+      this.clearBtn = this.querySelector('.kt-search-clear') as HTMLButtonElement;
+
+      this.input.addEventListener('input', () => this.onInput());
+      this.input.addEventListener('focus', () => { if (this.input.value.trim()) this.open(); });
+      this.input.addEventListener('keydown', (e) => this.onKeydown(e));
+      this.clearBtn.addEventListener('click', () => this.reset(true));
+
+      document.addEventListener('click', (e) => {
+        if (!this.contains(e.target as Node)) this.close();
+      });
+      document.addEventListener('kotova:close-search', () => this.close());
+
+      // ⌘K / Ctrl-K focuses the bar rather than opening a modal.
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          this.input.focus();
+          this.input.select();
+        }
+      });
+
+      // Restore a ?q= query so results are linkable.
+      const q = new URLSearchParams(location.search).get('q');
+      if (q) { this.input.value = q; this.onInput(); }
+    }
+
+    private async load() {
+      if (this.pagefind) return this.pagefind;
+      if (this.hasAttribute('data-dev')) return null;
+      try {
+        // Vite must not try to resolve this at build time — it is emitted by Pagefind.
+        this.pagefind = await import(/* @vite-ignore */ `${import.meta.env.BASE_URL}pagefind/pagefind.js`.replace('//', '/'));
+        await this.pagefind.options({ excerptLength: 20 });
+        await this.pagefind.init();
+      } catch {
+        this.pagefind = null;
+      }
+      return this.pagefind;
+    }
+
+    private onInput() {
+      const q = this.input.value.trim();
+      this.clearBtn.hidden = !q;
+      window.clearTimeout(this.timer);
+      if (!q) { this.close(); this.setQueryParam(''); return; }
+      this.timer = window.setTimeout(() => this.run(q), DEBOUNCE_MS);
+    }
+
+    private setQueryParam(q: string) {
+      const url = new URL(location.href);
+      if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+      history.replaceState(null, '', url);
+    }
+
+    private async run(q: string) {
+      const mine = ++this.seq;
+      this.open();
+      this.setQueryParam(q);
+
+      const pf = await this.load();
+      if (mine !== this.seq) return;
+
+      if (!pf) {
+        this.list.innerHTML = '';
+        this.status.textContent = this.hasAttribute('data-dev')
+          ? 'Search needs a production build — run “pnpm build && pnpm preview”.'
+          : 'Search is unavailable right now.';
+        return;
+      }
+
+      this.status.textContent = 'Searching…';
+      const search = await pf.search(q);
+      if (mine !== this.seq) return;
+
+      const data = await Promise.all(search.results.slice(0, MAX_RESULTS).map((r: any) => r.data()));
+      if (mine !== this.seq) return;
+
+      this.render(data, q);
+    }
+
+    /**
+     * Build format is `file`, so Pagefind indexes /a/b.html while every link on
+     * the site is /a/b. Sub-results also carry a #hash, so the extension has to
+     * be stripped from the path part rather than the end of the string.
+     * Pagefind uses #_top for "start of page", which is not a real anchor.
+     */
+    private tidy(url: string) {
+      const [path, hash] = url.split('#');
+      const clean = path.replace(/index\.html$/, '').replace(/\.html$/, '') || '/';
+      return hash && hash !== '_top' ? `${clean}#${hash}` : clean;
+    }
+
+    private render(data: any[], q: string) {
+      this.active = -1;
+      this.list.innerHTML = '';
+
+      if (!data.length) {
+        this.status.textContent = `No results for “${q}”.`;
+        this.input.setAttribute('aria-expanded', 'false');
+        return;
+      }
+
+      this.status.textContent = `${data.length} result${data.length === 1 ? '' : 's'}`;
+      this.input.setAttribute('aria-expanded', 'true');
+
+      data.forEach((d, i) => {
+        const best = d.sub_results?.[0];
+        const href = this.tidy(best?.url ?? d.url);
+        const crumb = this.tidy(d.url).split('/').filter(Boolean).slice(0, -1).join(' / ');
+
+        const li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-posinset', String(i + 1));
+        li.setAttribute('aria-setsize', String(data.length));
+        li.id = `kt-search-opt-${i}`;
+
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = 'kt-search-result';
+        a.innerHTML =
+          (crumb ? `<span class="kt-crumb">${crumb}</span>` : '') +
+          `<span class="kt-result-title">${d.meta?.title ?? 'Untitled'}</span>` +
+          `<span class="kt-result-excerpt">${
+            best?.title && best.title !== d.meta?.title ? `<em>${best.title}</em> · ` : ''
+          }${best?.excerpt ?? d.excerpt ?? ''}</span>`;
+
+        a.addEventListener('mouseenter', () => this.setActive(i));
+        li.append(a);
+        this.list.append(li);
+      });
+    }
+
+    private setActive(i: number) {
+      const items = [...this.list.querySelectorAll('li')];
+      items.forEach((li) => li.classList.remove('is-active'));
+      this.active = i;
+      if (i < 0 || !items[i]) { this.input.removeAttribute('aria-activedescendant'); return; }
+      items[i].classList.add('is-active');
+      this.input.setAttribute('aria-activedescendant', items[i].id);
+      items[i].scrollIntoView({ block: 'nearest' });
+    }
+
+    private onKeydown(e: KeyboardEvent) {
+      const items = [...this.list.querySelectorAll('li')];
+      if (e.key === 'Escape') { this.close(); this.input.blur(); return; }
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); this.setActive((this.active + 1) % items.length); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); this.setActive((this.active - 1 + items.length) % items.length); }
+      else if (e.key === 'Enter' && this.active >= 0) {
+        e.preventDefault();
+        (items[this.active].querySelector('a') as HTMLAnchorElement).click();
+      }
+    }
+
+    private open() { this.panel.hidden = false; this.classList.add('open'); }
+
+    private close() {
+      this.panel.hidden = true;
+      this.classList.remove('open');
+      this.input.setAttribute('aria-expanded', 'false');
+      this.input.removeAttribute('aria-activedescendant');
+      this.active = -1;
+    }
+
+    private reset(focus = false) {
+      this.input.value = '';
+      this.clearBtn.hidden = true;
+      this.setQueryParam('');
+      this.close();
+      if (focus) this.input.focus();
+    }
+  }
+
+  customElements.define('kotova-search', KotovaSearch);
+</script>

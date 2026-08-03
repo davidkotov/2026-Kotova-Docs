@@ -85,14 +85,18 @@ the source-onboarding checklist.
 ## High — blocks a named section
 
 ### Q5 — Navbar search placement
-The brief said the search bar sits "on the left of Services", but Services is being
-removed. Current reading, to confirm or correct:
+**DECIDED 2026-08-03: centred on the bar.**
 
 ```
-[panther] KOTOVA DOCS       [search…  ⌘K]  Contact  |  🌐  [Launch App]  [🇺🇸 EN ▾]
+[panther] KOTOVA DOCS      [ 🔍 Search  ⌘K ]      Support | 🌐 [Launch App] [🇺🇸 EN ▾]
 ```
 
-**Status:** _open_
+Also settled in the same pass: "Contact" became **Support** → `app.kotova.io/support`;
+the bar height matches kotova.io (77px measured) and app.kotova.io (78px); the language
+switcher matches the landing site's flag-and-code dropdown; and search is an inline
+panel anchored to the field rather than a full-screen modal.
+
+**Status:** ✅ **decided**
 
 ### Q6 — Bug bounty: four sub-decisions, all needed together
 1. **Reward budget — DECIDED 2026-08-02: published table.**

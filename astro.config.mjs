@@ -56,6 +56,8 @@ export default defineConfig({
         Header: './src/components/Header.astro',
         Footer: './src/components/Footer.astro',
         ThemeSelect: './src/components/Empty.astro',
+        Search: './src/components/Search.astro',
+        LanguageSelect: './src/components/LanguageSelect.astro',
         SocialIcons: './src/components/Empty.astro',
       },
 

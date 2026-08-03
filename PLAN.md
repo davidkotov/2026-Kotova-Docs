@@ -176,16 +176,31 @@ Copied from `2026-Kotova-LandingPage/services.html`, with these changes:
 - **Currency selector removed** — it would be cross-origin to the landing site's Netlify function and there are no prices on a docs page
 - **Search added**, at the left end of the right-aligned group, before "Contact"
 
+- **"Contact" → "Support"**, pointing at `app.kotova.io/support`
+- **Bar height matched to the rest of the estate.** Measured live: kotova.io/services
+  is 77px and app.kotova.io is 78px (16px padding + the 44px panther + a 1px
+  hairline). `--docs-header-h` is 77px; Starlight's default was 56px.
+
 Resulting order, left to right:
 
 ```
-[panther] KOTOVA DOCS          [search…  ⌘K]  Contact  |  🌐  [Launch App]  [🇺🇸 EN ▾]
+[panther] KOTOVA DOCS        [ 🔍 Search  ⌘K ]        Support | 🌐 [Launch App] [🇺🇸 EN ▾]
 ```
 
-> **Open question — see `DECISIONS.md` Q5.** The brief said the search bar sits "on
-> the left of Services", but Services is being removed. The layout above is my
-> reading: search occupies the left end of the right-aligned control group. Confirm
-> or correct.
+The search bar is **centred on the bar itself**, not merely placed between the two
+groups. `.kt-nav` is a three-column grid (`1fr minmax(0,26rem) 1fr`): the side tracks
+are equal by definition, so the middle column lands on true centre whatever the brand
+and controls happen to measure. Below 1150px and again below 960px the centre column
+narrows, because a grid track cannot shrink below its content's own width and the
+brand would otherwise push the field off centre.
+
+**Language switcher** replicates kotova.io exactly — flag plus uppercase code when
+closed, flag plus full language name plus a tick when open. Starlight's native
+`<select>` is overridden; locale paths are derived by swapping the first path segment.
+
+**Search is an inline combobox, not a modal.** Starlight's default opens a `<dialog>`
+over a dimmed page; this drops a panel directly beneath the field, anchored to it.
+It calls the Pagefind JS API directly.
 
 **Inherited bug to fix, not copy:** the landing navbar has *no mobile navigation* —
 at ≤1024px `.nav-links { display: none }` with no hamburger replacement. The docs

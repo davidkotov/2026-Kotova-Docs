@@ -78,7 +78,9 @@
     --docs-content-max: 768px;
     --docs-content-max-wide: 1152px;
     --docs-toc-w: 256px;
-    --docs-header-h: 64px;
+    /* Matches kotova.io/services (77px measured) and app.kotova.io (78px):
+       16px padding + the 44px panther mark + a 1px hairline. */
+    --docs-header-h: 77px;
 }
 
 /* ===================================================================

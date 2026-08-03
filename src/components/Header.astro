@@ -7,7 +7,7 @@
  *   - the "Services" link is dropped
  *   - the currency switcher is dropped (it calls the landing site's Netlify
  *     function, which would be cross-origin here, and no page shows a price)
- *   - a search control is added at the left of the right-aligned group
+ *   - a search control is added, centred in the bar
  *
  * The hamburger is NOT rendered here — Starlight's PageFrame renders
  * <MobileMenuToggle /> inside the sidebar <nav>. It is restyled in kotova.css to
@@ -32,11 +32,13 @@ const homeHref = locale && locale !== 'en' ? `/${locale}/` : '/';
     <span class="kt-brand-suffix">DOCS</span>
   </a>
 
-  <div class="kt-nav-right">
+  <div class="kt-nav-centre">
     {shouldRenderSearch && <Search />}
+  </div>
 
+  <div class="kt-nav-right">
     <div class="kt-nav-links">
-      <a href="https://kotova.io/#contact" class="kt-nav-link">Contact</a>
+      <a href="https://app.kotova.io/support" class="kt-nav-link">Support</a>
       <span class="kt-nav-separator" aria-hidden="true"></span>
       <a
         href="https://kotova.io"

@@ -1,0 +1,125 @@
+---
+/**
+ * Language switcher matching kotova.io's navbar exactly: flag + uppercase code
+ * when closed, flag + full language name + tick when open.
+ *
+ * Starlight's default is a native <select> with a globe icon. This replaces it
+ * with the landing site's markup so the two navbars look identical.
+ *
+ * The locale → path mapping is done here rather than via Starlight's internal
+ * `localizedUrl` helper, which is not part of the package's public exports.
+ * With `defaultLocale: 'root'`, English lives at `/x` and every other locale at
+ * `/<code>/x`, so swapping locales is just swapping the first path segment.
+ */
+import config from 'virtual:starlight/user-config';
+
+const FLAGS: Record<string, string> = {
+  en: '🇺🇸',
+  de: '🇩🇪',
+  it: '🇮🇹',
+  es: '🇪🇸',
+  fr: '🇫🇷',
+  ru: '🇷🇺',
+};
+
+const locales = config.locales ?? {};
+// Every locale that owns a path prefix — i.e. all of them except `root`.
+const prefixes = Object.keys(locales).filter((code) => code !== 'root');
+
+// With `build.format: 'file'`, Astro.url.pathname carries the emitted filename
+// (/security/x.html) while every link on the site is extensionless. Strip it so
+// the locale links match the rest of the navigation.
+const cleanPath = Astro.url.pathname.replace(/index\.html$/, '').replace(/\.html$/, '');
+const segments = cleanPath.split('/').filter(Boolean);
+const rest = prefixes.includes(segments[0] ?? '') ? segments.slice(1) : segments;
+
+function pathFor(code: string): string {
+  const parts = code === 'root' ? rest : [code, ...rest];
+  return parts.length ? `/${parts.join('/')}` : '/';
+}
+
+// `starlightRoute.locale` is undefined on the root (English) locale.
+const currentLocale = Astro.locals.starlightRoute.locale;
+
+const options = Object.entries(locales).map(([code, locale]) => {
+  const lang = code === 'root' ? (locale?.lang ?? 'en') : code;
+  return {
+    lang,
+    label: locale?.label ?? lang,
+    flag: FLAGS[lang] ?? '🏳️',
+    href: pathFor(code),
+    selected: code === 'root' ? !currentLocale : code === currentLocale,
+  };
+});
+
+const active = options.find((o) => o.selected) ?? options[0];
+---
+
+{
+  config.isMultilingual && active && (
+    <kotova-lang-select class="language-switch">
+      <button
+        class="language-toggle"
+        type="button"
+        aria-label={Astro.locals.t('languageSelect.accessibleLabel')}
+        aria-expanded="false"
+        aria-haspopup="true"
+      >
+        <span class="flag">{active.flag}</span>
+        <span class="lang-code">{active.lang}</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      <div class="language-dropdown" role="menu">
+        {options.map((o) => (
+          <a
+            class:list={['lang-option', { active: o.selected }]}
+            href={o.href}
+            hreflang={o.lang}
+            role="menuitem"
+            aria-current={o.selected ? 'true' : undefined}
+          >
+            <span class="flag">{o.flag}</span>
+            <span class="lang-name">{o.label}</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </a>
+        ))}
+      </div>
+    </kotova-lang-select>
+  )
+}
+
+<script>
+  class KotovaLangSelect extends HTMLElement {
+    connectedCallback() {
+      const btn = this.querySelector('button');
+      if (!btn) return;
+
+      const close = () => {
+        this.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      };
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = this.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+        // Never leave two navbar dropdowns open at once.
+        if (open) document.dispatchEvent(new CustomEvent('kotova:close-search'));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!this.contains(e.target as Node)) close();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      });
+      document.addEventListener('kotova:close-lang', close);
+    }
+  }
+  customElements.define('kotova-lang-select', KotovaLangSelect);
+</script>
