@@ -5,13 +5,22 @@
  * Content is identical to the landing site (2026-Kotova-LandingPage/index.html)
  * and the exchange app (apps/exchange/src/components/Footer.tsx), which already
  * match each other. If any of the three changes, change all three.
+ * The strings live in src/content/i18n/<lang>.json, taken from the landing
+ * site's translations.json (common.footer.*).
  *
  * Starlight's default footer also carries the prev/next pagination, so it is
  * rendered above the site footer rather than replaced.
  */
 import Pagination from '@astrojs/starlight/components/Pagination.astro';
+import { withLang } from '../utils/links';
 
 const year = 2026;
+const t = Astro.locals.t;
+
+// Undefined on the root (English) locale, where every link stays as written.
+const locale = Astro.locals.starlightRoute.locale;
+const out = (url: string) => withLang(url, locale);
+const docsHref = locale ? `https://docs.kotova.io/${locale}` : 'https://docs.kotova.io/';
 ---
 
 <Pagination />
@@ -21,7 +30,7 @@ const year = 2026;
     <div class="kt-footer-grid">
       <div class="kt-footer-brand">
         <div class="kt-footer-brandname"><span class="kt-brand-accent">KOTOVA</span></div>
-        <p class="kt-footer-tagline">Trade Without Borders.</p>
+        <p class="kt-footer-tagline">{t('kotova.footer.tagline')}</p>
         <div class="kt-footer-social">
           <a href="https://www.instagram.com/kotova_io" class="kt-social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
@@ -39,34 +48,32 @@ const year = 2026;
       </div>
 
       <div class="kt-footer-links">
-        <h4>Company</h4>
-        <a href="https://kotova.io/#about">About Us</a>
-        <a href="https://kotova.io/careers">Careers</a>
-        <a href="https://kotova.io/investor-relations">Investor Relations</a>
-        <a href="https://kotova.io/press/brand-assets">Brand Assets</a>
+        <h4>{t('kotova.footer.company')}</h4>
+        <a href={out('https://kotova.io/#about')}>{t('kotova.footer.aboutUs')}</a>
+        <a href={out('https://kotova.io/careers')}>{t('kotova.footer.careers')}</a>
+        <a href={out('https://kotova.io/investor-relations')}>{t('kotova.footer.investorRelations')}</a>
+        <a href={out('https://kotova.io/press/brand-assets')}>{t('kotova.footer.brandAssets')}</a>
       </div>
 
       <div class="kt-footer-links">
-        <h4>Kotova X</h4>
-        <a href="https://app.kotova.io/">Exchange</a>
-        <a href="https://kotova.io/x/assets">Assets</a>
-        <a href="https://kotova.io/x/guides/btc-to-eth">Guide</a>
-        <a href="https://docs.kotova.io/">Docs</a>
+        <h4>{t('kotova.footer.kotovaX')}</h4>
+        <a href={out('https://app.kotova.io/')}>{t('kotova.footer.exchange')}</a>
+        <a href={out('https://kotova.io/x/assets')}>{t('kotova.footer.assets')}</a>
+        <a href={out('https://kotova.io/x/guides/btc-to-eth')}>{t('kotova.footer.guide')}</a>
+        <a href={docsHref}>{t('kotova.footer.docs')}</a>
       </div>
 
       <div class="kt-footer-links">
-        <h4>Legal</h4>
-        <a href="https://kotova.io/terms/">Terms of Service</a>
-        <a href="https://kotova.io/terms/imprint">Imprint</a>
-        <a href="https://kotova.io/terms/privacy">Privacy Policy</a>
+        <h4>{t('kotova.footer.legal')}</h4>
+        <a href={out('https://kotova.io/terms/')}>{t('kotova.footer.termsOfService')}</a>
+        <a href={out('https://kotova.io/terms/imprint')}>{t('kotova.footer.imprint')}</a>
+        <a href={out('https://kotova.io/terms/privacy')}>{t('kotova.footer.privacyPolicy')}</a>
       </div>
     </div>
 
     <div class="kt-footer-bottom">
-      <p>&copy; {year} Kotova. All rights reserved.</p>
-      <p class="kt-disclaimer">
-        Crypto assets are highly volatile. Past performance is not indicative of future results.
-      </p>
+      <p>{t('kotova.footer.copyright', { year })}</p>
+      <p class="kt-disclaimer">{t('kotova.footer.disclaimer')}</p>
     </div>
   </div>
 </footer>

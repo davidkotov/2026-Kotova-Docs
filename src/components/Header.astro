@@ -16,13 +16,18 @@
 import config from 'virtual:starlight/user-config';
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
+import { withLang } from '../utils/links';
 
 const shouldRenderSearch =
   config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
 
-// Locale-aware home link: /de/… keeps the reader in their locale.
-const locale = Astro.currentLocale;
-const homeHref = locale && locale !== 'en' ? `/${locale}/` : '/';
+const t = Astro.locals.t;
+
+// Locale-aware home link: /de keeps the reader in their locale. `locale` is
+// undefined on the root (English) locale. No trailing slash — the locale home
+// is emitted as /de.html, matching `trailingSlash: 'never'`.
+const locale = Astro.locals.starlightRoute.locale;
+const homeHref = locale ? `/${locale}` : '/';
 ---
 
 <div class="kt-nav">
@@ -38,13 +43,13 @@ const homeHref = locale && locale !== 'en' ? `/${locale}/` : '/';
 
   <div class="kt-nav-right">
     <div class="kt-nav-links">
-      <a href="https://app.kotova.io/support" class="kt-nav-link">Support</a>
+      <a href={withLang('https://app.kotova.io/support', locale)} class="kt-nav-link">{t('kotova.nav.support')}</a>
       <span class="kt-nav-separator" aria-hidden="true"></span>
       <a
-        href="https://kotova.io"
+        href={withLang('https://kotova.io', locale)}
         class="kt-nav-link kt-nav-globe"
         title="kotova.io"
-        aria-label="kotova.io homepage"
+        aria-label={t('kotova.nav.homepageLabel')}
       >
         <svg class="kt-globe-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <circle cx="12" cy="12" r="10"></circle>
@@ -53,7 +58,7 @@ const homeHref = locale && locale !== 'en' ? `/${locale}/` : '/';
       </a>
     </div>
 
-    <a href="https://app.kotova.io/" class="kt-app-btn">Launch App</a>
+    <a href={withLang('https://app.kotova.io/', locale)} class="kt-app-btn">{t('kotova.nav.launchApp')}</a>
 
     <div class="kt-lang"><LanguageSelect /></div>
   </div>

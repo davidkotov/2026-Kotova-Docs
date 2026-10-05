@@ -15,9 +15,26 @@
  * /pagefind/ directory, so the panel says so instead of failing silently.
  */
 const isDev = import.meta.env.DEV;
+const t = Astro.locals.t;
+
+// The result panel is filled in by the client script, which has no access to
+// `Astro.locals.t`, so its strings travel on the element. `{query}` and
+// `{count}` are substituted in the browser.
+const strings = {
+  searching: t('kotova.search.searching'),
+  unavailable: t('kotova.search.unavailable'),
+  noResults: t('kotova.search.noResults'),
+  untitled: t('kotova.search.untitled'),
+  results: {
+    one: t('kotova.search.resultsOne'),
+    few: t('kotova.search.resultsFew'),
+    many: t('kotova.search.resultsMany'),
+    other: t('kotova.search.resultsOther'),
+  },
+};
 ---
 
-<kotova-search class="kt-search" data-dev={isDev ? '' : undefined}>
+<kotova-search class="kt-search" data-dev={isDev ? '' : undefined} data-strings={JSON.stringify(strings)}>
   <div class="kt-search-field">
     <svg class="kt-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <circle cx="11" cy="11" r="7"></circle>
@@ -39,7 +56,7 @@ const isDev = import.meta.env.DEV;
 
     <kbd class="kt-search-kbd" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></kbd>
 
-    <button class="kt-search-clear" type="button" aria-label="Clear search" hidden>
+    <button class="kt-search-clear" type="button" aria-label={t('kotova.search.clear')} hidden>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -51,9 +68,9 @@ const isDev = import.meta.env.DEV;
     <ul id="kt-search-results" class="kt-search-results" role="listbox" aria-live="polite"></ul>
     <div class="kt-search-status" role="status"></div>
     <div class="kt-search-hint" aria-hidden="true">
-      <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
-      <span><kbd>↵</kbd> Open</span>
-      <span><kbd>esc</kbd> Close</span>
+      <span><kbd>↑</kbd><kbd>↓</kbd> {t('kotova.search.navigate')}</span>
+      <span><kbd>↵</kbd> {t('kotova.search.open')}</span>
+      <span><kbd>esc</kbd> {t('kotova.search.close')}</span>
     </div>
   </div>
 </kotova-search>
@@ -62,7 +79,17 @@ const isDev = import.meta.env.DEV;
   const MAX_RESULTS = 8;
   const DEBOUNCE_MS = 180;
 
+  type Strings = {
+    searching: string;
+    unavailable: string;
+    noResults: string;
+    untitled: string;
+    results: Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
+  };
+
   class KotovaSearch extends HTMLElement {
+    private strings!: Strings;
+    private plural = new Intl.PluralRules(document.documentElement.lang || 'en');
     private input!: HTMLInputElement;
     private panel!: HTMLElement;
     private list!: HTMLUListElement;
@@ -79,6 +106,7 @@ const isDev = import.meta.env.DEV;
       this.list = this.querySelector('.kt-search-results') as HTMLUListElement;
       this.status = this.querySelector('.kt-search-status') as HTMLElement;
       this.clearBtn = this.querySelector('.kt-search-clear') as HTMLButtonElement;
+      this.strings = JSON.parse(this.dataset.strings as string);
 
       this.input.addEventListener('input', () => this.onInput());
       this.input.addEventListener('focus', () => { if (this.input.value.trim()) this.open(); });
@@ -144,11 +172,11 @@ const isDev = import.meta.env.DEV;
         this.list.innerHTML = '';
         this.status.textContent = this.hasAttribute('data-dev')
           ? 'Search needs a production build — run “pnpm build && pnpm preview”.'
-          : 'Search is unavailable right now.';
+          : this.strings.unavailable;
         return;
       }
 
-      this.status.textContent = 'Searching…';
+      this.status.textContent = this.strings.searching;
       const search = await pf.search(q);
       if (mine !== this.seq) return;
 
@@ -175,12 +203,15 @@ const isDev = import.meta.env.DEV;
       this.list.innerHTML = '';
 
       if (!data.length) {
-        this.status.textContent = `No results for “${q}”.`;
+        // A function replacer, so a `$&` typed into the search box stays literal.
+        this.status.textContent = this.strings.noResults.replace('{query}', () => q);
         this.input.setAttribute('aria-expanded', 'false');
         return;
       }
 
-      this.status.textContent = `${data.length} result${data.length === 1 ? '' : 's'}`;
+      const { results } = this.strings;
+      const form = results[this.plural.select(data.length)] ?? results.other;
+      this.status.textContent = form.replace('{count}', String(data.length));
       this.input.setAttribute('aria-expanded', 'true');
 
       data.forEach((d, i) => {
@@ -199,7 +230,7 @@ const isDev = import.meta.env.DEV;
         a.className = 'kt-search-result';
         a.innerHTML =
           (crumb ? `<span class="kt-crumb">${crumb}</span>` : '') +
-          `<span class="kt-result-title">${d.meta?.title ?? 'Untitled'}</span>` +
+          `<span class="kt-result-title">${d.meta?.title ?? this.strings.untitled}</span>` +
           `<span class="kt-result-excerpt">${
             best?.title && best.title !== d.meta?.title ? `<em>${best.title}</em> · ` : ''
           }${best?.excerpt ?? d.excerpt ?? ''}</span>`;
